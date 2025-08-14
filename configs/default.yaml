@@ -1,0 +1,35 @@
+# Multilingual Sarcasm Detection Configuration
+model_name: roberta-base
+batch_size: 16
+epochs: 3
+lr: 2e-5
+max_length: 192
+use_commonsense: 1
+use_contrastive: 1
+lambda_contrastive: 0.2
+
+# Language-specific configurations
+languages:
+  en:
+    model_name: roberta-base
+    max_length: 192
+    use_commonsense: 1
+    use_contrastive: 1
+  hi:
+    model_name: ai4bharat/indic-bert
+    max_length: 256
+    use_commonsense: 0  # Hindi commonsense sources may be limited
+    use_contrastive: 1
+
+# Training settings
+training:
+  warmup_steps: 500
+  weight_decay: 0.01
+  gradient_accumulation_steps: 1
+  fp16: true
+  
+# Evaluation settings
+evaluation:
+  metrics: ["f1", "precision", "recall", "auroc"]
+  save_predictions: true
+  error_analysis: true
