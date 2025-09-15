@@ -1,0 +1,39 @@
+seed: 42
+exp_name: english_roberta_rcnn
+output_dir: outputs/english_roberta_rcnn
+
+model:
+  backbone: roberta-base
+  max_length: 128
+  lora:
+    enabled: true
+    r: 8
+    alpha: 16
+    dropout: 0.1
+  rcnn:
+    conv_channels: 256
+    kernel_sizes: [2,3,4]
+    rnn_hidden: 256
+    rnn_layers: 1
+    dropout: 0.2
+
+train:
+  batch_size: 16
+  grad_accum_steps: 2
+  epochs: 5
+  lr: 2.0e-5
+  weight_decay: 0.01
+  warmup_ratio: 0.06
+  fp16: true
+
+data:
+  train_file: data/english/train.csv
+  val_file: data/english/val.csv
+  text_col: text
+  label_col: label
+  num_labels: 2
+
+logging:
+  log_steps: 50
+  save_steps: 500
+  eval_steps: 500

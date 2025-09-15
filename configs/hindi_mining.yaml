@@ -1,0 +1,23 @@
+seed: 42
+exp_name: hindi_mining
+output_dir: outputs/hindi_mining
+
+translation:
+  model: Helsinki-NLP/opus-mt-en-hi
+  batch_size: 16
+
+embedding:
+  model: sentence-transformers/LaBSE
+  max_length: 256
+  faiss_index: outputs/hindi_mining/index.faiss
+  dim: 768
+
+corpora:
+  mono_dir: corpora/hindi/
+  translated_src: outputs/hindi_mining/sar_h_prime.csv
+  mined_out: outputs/hindi_mining/mined_candidates.csv
+
+mining:
+  top_k: 3
+  score_threshold: 0.7
+  max_per_source: 10
