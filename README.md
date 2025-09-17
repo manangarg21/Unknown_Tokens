@@ -60,6 +60,40 @@ Project/
       *.txt         # plain text files, one or more lines per file
 ```
 
+### 3a) Recommended datasets and sources (from project outline)
+
+Use the following sources to acquire datasets, then convert them to the simple `text,label` CSV format and place them under `data/english/` or `data/hinglish/` as shown above.
+
+- **English**
+  - Tweets with Sarcasm and Irony (news headlines): `kaggle datasets download -d rmisra/news-headlines-dataset-for-sarcasm-detection`
+  - iSarcasm (intended sarcasm) dataset overview: `paperswithcode.com/dataset/isarcasm` (download via authors' link)
+  - SemEval-2018 Task 3: Irony detection in English tweets: `aclanthology.org/S18-1005/` (download via task page/CodaLab)
+
+- **Hinglish**
+  - HackArena Multilingual Sarcasm Detection: `kaggle datasets download -d nikhilmaram/hackarena-multilingual-sarcasm-detection`
+  - Sarcasm Detection Code-Mixed Dataset: `github.com/nikhilmaram/Sarcasm-Detection-Code-Mixed-Dataset`
+  - Sarcasm Detection in Hindi-English Code-Mixed Data: `github.com/nikhilmaram/Sarcasm-Detection-in-Hindi-English-Code-Mixed-Data`
+
+- **Hindi corpora (optional, for mining/augmentation)**
+  - IndicCorpv2 (Hindi subset): `ai4bharat.iitm.ac.in/indiccorp`
+  - IITB English–Hindi Parallel Text (BPCC): `cfilt.iitb.ac.in/iitb_parallel/`
+  - OSCAR dataset (Hindi subset): `oscar-corpus.com`
+
+Notes:
+- Ensure each CSV has exactly two columns named `text,label` with labels as 0/1.
+- For Kaggle datasets, you can use the Kaggle CLI (after configuring your API token) and unzip locally, then normalize column names before copying to `data/...`.
+- Some sources distribute multiple files/splits; you may merge/split as needed to produce `train.csv` and `val.csv`.
+
+### 3b) One-click download (optional)
+
+Use the helper script to fetch and organize public datasets mentioned above. You must have Kaggle CLI configured (`~/.kaggle/kaggle.json`).
+
+```bash
+bash scripts/download_datasets.sh
+```
+
+The script downloads into `data/english/`, `data/hinglish/`, and prints instructions for manually hosted datasets (SemEval Task 3, iSarcasm authors' link, Hindi corpora).
+
 ## 4) English track (RoBERTa + RCNN)
 Config: `configs/english_roberta_rcnn.yaml`
 - Key toggles:

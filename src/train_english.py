@@ -7,6 +7,7 @@ from transformers import AutoTokenizer, AutoModel
 from transformers import get_linear_schedule_with_warmup
 from torch.utils.data import DataLoader
 import torch.nn as nn
+from tqdm.auto import tqdm
 import torch.optim as optim
 
 from src.utils.io import load_yaml, ensure_dir
@@ -51,7 +52,8 @@ def main(cfg: Dict[str, Any]) -> None:
             super().__init__()
             self.backbone = backbone
             self.head = head
-        def forward(self, input_ids, attention_mask):
+        def forward(self, input_ids, attention_mask, **_: Any):
+            # Accept and ignore any extra kwargs (e.g., labels) to avoid passing them to the backbone
             outputs = self.backbone(input_ids=input_ids, attention_mask=attention_mask)
             seq = outputs.last_hidden_state
             return self.head(seq, attention_mask)
@@ -83,7 +85,8 @@ def main(cfg: Dict[str, Any]) -> None:
     for epoch in range(cfg["train"]["epochs"]):
         model.train()
         optimizer.zero_grad()
-        for step, batch in enumerate(train_loader, 1):
+        train_iter = tqdm(train_loader, disable=not accelerator.is_local_main_process, desc=f"Train E{epoch+1}")
+        for step, batch in enumerate(train_iter, 1):
             logits = model(batch["input_ids"], batch["attention_mask"])
             loss = criterion(logits, batch["labels"])
             accelerator.backward(loss)
@@ -97,7 +100,8 @@ def main(cfg: Dict[str, Any]) -> None:
         model.eval()
         all_preds, all_labels = [], []
         with torch.no_grad():
-            for batch in val_loader:
+            val_iter = tqdm(val_loader, disable=not accelerator.is_local_main_process, desc=f"Val   E{epoch+1}")
+            for batch in val_iter:
                 logits = model(batch["input_ids"], batch["attention_mask"])
                 preds = torch.argmax(logits, dim=-1)
                 all_preds.extend(accelerator.gather(preds).cpu().tolist())
