@@ -62,7 +62,7 @@ def main(cfg: Dict[str, Any]) -> None:
     # Data
     train_df = load_csv(cfg["data"]["train_file"], cfg["data"]["text_col"], cfg["data"]["label_col"]).rename(columns={cfg["data"]["text_col"]:"text", cfg["data"]["label_col"]:"label"})
     val_df = load_csv(cfg["data"]["val_file"], cfg["data"]["text_col"], cfg["data"]["label_col"]).rename(columns={cfg["data"]["text_col"]:"text", cfg["data"]["label_col"]:"label"})
-
+    print(f"Train size: {len(train_df)}, Val size: {len(val_df)}")
     # ConceptNet enrichment: naive token-level feature injection via appending top concepts to text
     if cfg["model"]["conceptnet"]["enabled"]:
         cache_dir = cfg["model"]["conceptnet"].get("cache_dir")
@@ -75,8 +75,8 @@ def main(cfg: Dict[str, Any]) -> None:
             if extra:
                 return t + " \n concepts: " + " ".join(extra)
             return t
-        train_df["text"] = train_df["text"].astype(str).map(enrich_text)
-        val_df["text"] = val_df["text"].astype(str).map(enrich_text)
+        train_df["text"] = [enrich_text(t) for t in tqdm(train_df["text"].astype(str), desc="Enrich train")]
+        val_df["text"] = [enrich_text(t) for t in tqdm(val_df["text"].astype(str), desc="Enrich val")]
 
     collate = TokenizeCollator(tokenizer=tokenizer, max_length=cfg["model"]["max_length"]) 
 
