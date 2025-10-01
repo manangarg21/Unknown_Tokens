@@ -146,7 +146,7 @@ python "$PYTHON_SCRIPT_PATH" \
 
 ## Output files
 
-All outputs are written to the directory set by `AUGMENTATION_OUTPUT_DIR` in the SLURM script (for example, `/ssd_scratch/aanvik/augmentation_output`). The most relevant files are:
+All outputs are written to the directory set by `AUGMENTATION_OUTPUT_DIR` in the SLURM script (for example, `./data/hindi_dataset_generation/augmentation_output`). The most relevant files are:
 
 * `output_{dataset_name}_translated.csv` — intermediate file containing original English text and its Hindi translation.
 * `output_{dataset_name}_potential_sarcasm.csv` — main output: contains the original English text, rephrased English (if applicable), the translated Hindi query, the matched Hindi sentence from the corpus, and the similarity score.
