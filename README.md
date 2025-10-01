@@ -16,11 +16,9 @@ All optional parts are included and configurable.
 ## 2) Setup
 From the project root:
 ```powershell
-# Create and activate a virtual environment (PowerShell)
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 
-# Install dependencies
 pip install -r requirements.txt
 ```
 Bash alternative:
@@ -234,6 +232,3 @@ Notes:
 - Windows + FAISS: if `pip install faiss-cpu` fails, try conda (`conda install faiss-cpu -c pytorch`) or skip Hindi mining
 - CUDA OOM: lower `train.batch_size` or increase `train.grad_accum_steps`, reduce `model.max_length`
 - Slow CPU runs: prefer GPU; or enable LoRA to reduce trainable params
-
-## 12) License
-Academic/research use.

@@ -1,30 +1,19 @@
-# Core
-torch>=2.1.0
-transformers>=4.44.0
-datasets>=2.21.0
-accelerate>=0.34.0
-peft>=0.12.0
-sentencepiece>=0.2.0
-scikit-learn>=1.5.0
-pandas>=2.2.2
-numpy>=1.26.0
-pyyaml>=6.0.1
-rich>=13.7.1
-
-# Embeddings and similarity
-sentence-transformers>=3.0.1
-faiss-cpu>=1.8.0
-
-# Tokenization and text utils
-langdetect>=1.0.9
-emoji>=2.12.1
-
-# Optional ConceptNet access
-requests>=2.32.3
-cachetools>=5.3.3
-
-# Progress
-tqdm>=4.66.4
-
-# Notebook/CLI (optional)
-jupyter>=1.0.0
+torch
+transformers
+datasets
+accelerate
+peft
+sentencepiece
+scikit-learn
+pandas
+numpy
+pyyaml
+rich
+sentence-transformers
+faiss-cpu
+langdetect
+emoji
+requests
+cachetools
+tqdm
+jupyter
