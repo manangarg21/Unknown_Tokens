@@ -1,0 +1,17 @@
+torch
+transformers
+accelerate
+pandas
+scikit-learn
+tqdm
+pyyaml
+requests
+datasets
+peft
+sentencepiece
+rich
+sentence-transformers
+faiss-cpu
+langdetect
+emoji
+cachetools
