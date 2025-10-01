@@ -16,10 +16,10 @@ It follows these steps:
 7.  Save the results with a dynamic name based on the source dataset.
 
 To run (example for iSarcasm dataset):
-python main.py --input_file path/to/isarcasm.csv --dataset_name isarcasm --corpus_file path/to/hindi_corpus.txt --output_dir path/to/save/results
+python3 hindi_corp_gen.py --input_file path/to/isarcasm.csv --dataset_name isarcasm --corpus_file path/to/hindi_corpus.txt --output_dir path/to/save/results
 
 To run (example for Huffington Post dataset, skipping translation):
-python main.py --input_file path/to/huffpost_translated.csv --dataset_name huffpost --skip_translation --corpus_file path/to/hindi_corpus.txt --output_dir path/to/save/results
+python3 hindi_corp_gen.py --input_file path/to/huffpost_translated.csv --dataset_name huffpost --skip_translation --corpus_file path/to/hindi_corpus.txt --output_dir path/to/save/results
 """
 import pandas as pd
 import torch
@@ -69,7 +69,7 @@ def load_sarcasm_dataset(filepath: str) -> pd.DataFrame:
             if 'rephrase' not in sarcastic_df.columns:
                 sarcastic_df['rephrase'] = None
             
-            print(f"✅ Loaded {len(df)} rows from CSV, found {len(sarcastic_df)} sarcastic entries.\n")
+            print(f"Loaded {len(df)} rows from CSV, found {len(sarcastic_df)} sarcastic entries.\n")
             # The 'text' column will be used for translation, and 'rephrase' will be carried through.
             return sarcastic_df[['text', 'rephrase']]
 
@@ -96,10 +96,10 @@ def load_sarcasm_dataset(filepath: str) -> pd.DataFrame:
             raise ValueError(f"Unsupported file format for: {filepath}. Please use .csv or .jsonl.")
 
     except FileNotFoundError:
-        print(f"❌ ERROR: The file was not found at {filepath}")
+        print(f"ERROR: The file was not found at {filepath}")
         raise
     except Exception as e:
-        print(f"❌ ERROR: An error occurred while reading the input file: {e}")
+        print(f"ERROR: An error occurred while reading the input file: {e}")
         raise
 
 
@@ -132,7 +132,7 @@ def translate_english_to_hindi(df: pd.DataFrame, output_dir: str, dataset_name: 
     os.makedirs(output_dir, exist_ok=True)
     translated_file = os.path.join(output_dir, f"output_{dataset_name}_translated.csv")
     sar_h_prime_df.to_csv(translated_file, index=False)
-    print(f"✅ Translation complete. Saved to {translated_file}\n")
+    print(f"Translation complete. Saved to {translated_file}\n")
     return sar_h_prime_df
 
 
@@ -149,7 +149,7 @@ def get_monolingual_hindi_corpus(corpus_filepath: str, offset: int) -> Dataset:
 
         with open(corpus_filepath, 'r', encoding='utf-8') as f:
             if offset > 0:
-                print(f"⏩ Skipping first {offset} lines of the corpus file...")
+                print(f"Skipping first {offset} lines of the corpus file...")
                 for _ in tqdm(range(offset), desc="Applying offset"):
                     next(f, None)
             
@@ -170,13 +170,13 @@ def get_monolingual_hindi_corpus(corpus_filepath: str, offset: int) -> Dataset:
             raise ValueError("Corpus file is empty or no valid sentences were found after filtering.")
 
         mono_h_dataset = Dataset.from_dict({'text': hindi_texts})
-        print(f"✅ Read {lines_read} lines after offset, kept {len(mono_h_dataset)} valid sentences.\n")
+        print(f"Read {lines_read} lines after offset, kept {len(mono_h_dataset)} valid sentences.\n")
         return mono_h_dataset
     except FileNotFoundError:
-        print(f"❌ ERROR: The corpus file was not found at {corpus_filepath}")
+        print(f"ERROR: The corpus file was not found at {corpus_filepath}")
         raise
     except Exception as e:
-        print(f"❌ ERROR: An error occurred while reading the corpus file: {e}")
+        print(f"ERROR: An error occurred while reading the corpus file: {e}")
         raise
 
 
@@ -209,7 +209,7 @@ def find_semantically_similar(query_sentences: list, corpus_dataset: Dataset):
     print(f"FAISS index built with {index.ntotal} vectors.")
 
     distances, indices = index.search(query_embeddings, NEAREST_NEIGHBORS_K)
-    print("✅ Search complete.\n")
+    print("Search complete.\n")
     return distances, indices
 
 
@@ -241,7 +241,7 @@ def create_and_save_datasets(distances, indices, sar_h_prime_df: pd.DataFrame, c
                     })
     
     if not found_matches:
-        print(f"⚠️ No sentences found in the corpus above the current similarity threshold of {similarity_threshold}.\n")
+        print(f"No sentences found in the corpus above the current similarity threshold of {similarity_threshold}.\n")
         return
     
     matches_df = pd.DataFrame(found_matches)
@@ -260,8 +260,8 @@ def create_and_save_datasets(distances, indices, sar_h_prime_df: pd.DataFrame, c
     df_for_review = matches_df.sample(n=sample_size, random_state=42)
     df_for_review.to_csv(verification_sample_file, index=False)
     
-    print(f"✅ Saved potential sarcasm dataset to {potential_sarcasm_file}")
-    print(f"✅ Saved {len(df_for_review)} samples for review to {verification_sample_file}\n")
+    print(f"Saved potential sarcasm dataset to {potential_sarcasm_file}")
+    print(f"Saved {len(df_for_review)} samples for review to {verification_sample_file}\n")
     
 
 def main():
@@ -318,13 +318,13 @@ def main():
                 sar_h_prime_df = pd.read_csv(args.input_file)
                 if 'translated_hindi' not in sar_h_prime_df.columns or 'original_english' not in sar_h_prime_df.columns or 'original_rephrase' not in sar_h_prime_df.columns:
                     raise ValueError("Input file for --skip_translation must contain 'translated_hindi', 'original_english', and 'original_rephrase' columns.")
-                print(f"✅ Loaded {len(sar_h_prime_df)} pre-translated sentences.\n")
+                print(f"Loaded {len(sar_h_prime_df)} pre-translated sentences.\n")
             except FileNotFoundError:
-                print(f"❌ ERROR: The pre-translated file was not found at {args.input_file}")
+                print(f"ERROR: The pre-translated file was not found at {args.input_file}")
                 print("Please run the script without --skip_translation first to generate this file.")
                 raise
             except Exception as e:
-                print(f"❌ ERROR: An error occurred while reading the pre-translated CSV: {e}")
+                print(f"ERROR: An error occurred while reading the pre-translated CSV: {e}")
                 raise
         else:
             # Step 1: Load English Dataset (handles both CSV and JSONL)

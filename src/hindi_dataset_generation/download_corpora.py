@@ -46,7 +46,7 @@ def download_and_combine(urls: list, output_file: str):
                     f_out.write(b'\n')
 
             except requests.exceptions.RequestException as e:
-                print(f"❌ ERROR: Failed to download {url}. Reason: {e}")
+                print(f"ERROR: Failed to download {url}. Reason: {e}")
                 continue # Skip to the next URL
 
     print("\n--- Download and combination complete! ---")
