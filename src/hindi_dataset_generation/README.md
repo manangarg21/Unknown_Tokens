@@ -31,7 +31,7 @@ sarcasm_project/
 
 Follow these steps to configure and run the pipeline.
 
-### Step 1 — One-time environment setup
+### Step 1 : One-time environment setup
 
 You only need to do this once.
 
@@ -44,15 +44,15 @@ mkdir -p /ssd_scratch/aanvik/huggingface_cache
 exit
 ```
 
-3. **Get a Hugging Face token.**
+3. **Get a Hugging Face token**
 
    * Go to [https://huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
    * Create a token with at least **read** permissions
-   * Copy the token — you will paste it into the SLURM scripts (`HF_TOKEN` variable)
+   * Copy the token, you will paste it into the SLURM scripts (`HF_TOKEN` variable)
 
 ---
 
-### Step 2 — Download the Hindi monolingual corpus (run once)
+### Step 2 : Download the Hindi monolingual corpus (run once)
 
 This step downloads the large IndicCorpV2 dataset (or other Hindi corpora) and concatenates it into a single text file on scratch.
 
@@ -71,7 +71,7 @@ This will produce a file such as:
 
 ---
 
-### Step 3 — Run the main augmentation pipeline
+### Step 3 : Run the main augmentation pipeline
 
 This runs translation (optional) and the similarity-search augmentation.
 
@@ -93,7 +93,7 @@ You can tweak the behavior by editing `translation_check.sh` before submitting i
 
 `translation_check.sh` contains separate blocks for each dataset (for example: iSarcasm and Huffington Post). To run only one dataset, comment out the other block by prefixing its lines with `#`.
 
-**Example — Run only the iSarcasm dataset:**
+**Example : Run only the iSarcasm dataset:**
 
 ```bash
 # --- Run pipeline for iSarcasm dataset ---
@@ -115,7 +115,7 @@ python "$PYTHON_SCRIPT_PATH" \
 
 Translation is slow; once you have the translated files, you can skip translation for subsequent runs by using the `--skip_translation` flag and passing the previously produced translated CSVs.
 
-**Example — Run without translation (both datasets):**
+**Example : Run without translation (both datasets):**
 
 ```bash
 # --- To run WITHOUT translation in the future ---
@@ -138,8 +138,8 @@ python "$PYTHON_SCRIPT_PATH" \
 
 ### Adjusting similarity and corpus parameters
 
-* **Similarity threshold**: `--similarity_threshold 0.75` — lower (e.g., `0.70`) to get more matches, raise for stricter matches.
-* **Corpus offset**: `--corpus_offset 0` — set to the number of lines to skip in the big corpus file to process later chunks (e.g., `--corpus_offset 1000000` to skip the first million lines).
+* **Similarity threshold**: `--similarity_threshold 0.75` lower (e.g., `0.70`) to get more matches, raise for stricter matches.
+* **Corpus offset**: `--corpus_offset 0` set to the number of lines to skip in the big corpus file to process later chunks (e.g., `--corpus_offset 1000000` to skip the first million lines).
 * **Corpus size per run**: To change how many sentences are processed per run, edit the `MAX_CORPUS_SIZE` variable in the top of `hindi_corp_gen.py`.
 
 ---
@@ -148,8 +148,8 @@ python "$PYTHON_SCRIPT_PATH" \
 
 All outputs are written to the directory set by `AUGMENTATION_OUTPUT_DIR` in the SLURM script (for example, `./data/hindi_dataset_generation/augmentation_output`). The most relevant files are:
 
-* `output_{dataset_name}_translated.csv` — intermediate file containing original English text and its Hindi translation.
-* `output_{dataset_name}_potential_sarcasm.csv` — main output: contains the original English text, rephrased English (if applicable), the translated Hindi query, the matched Hindi sentence from the corpus, and the similarity score.
-* `output_{dataset_name}_verification_sample.csv` — a smaller random sample useful for manual quality checks and annotation.
+* `output_{dataset_name}_translated.csv` : intermediate file containing original English text and its Hindi translation.
+* `output_{dataset_name}_potential_sarcasm.csv` : main output, contains the original English text, rephrased English (if applicable), the translated Hindi query, the matched Hindi sentence from the corpus, and the similarity score.
+* `output_{dataset_name}_verification_sample.csv` : a smaller random sample useful for manual quality checks and annotation.
 
 ---
