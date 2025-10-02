@@ -1,260 +1,234 @@
-# Multilingual Sarcasm and Irony Detection Framework
+# Unknown_Tokens: Context-Aware Sarcasm and Irony Detection
 
-A flexible and robust framework for detecting sarcasm and irony in **English** and **Hindi** text, leveraging contextual analysis and transformer-based models.
+End-to-end implementation per the outline:
+- English track: RoBERTa + RCNN head (+ optional LoRA adapters)
+- Hinglish track: mBERT/IndicBERT + GRU head (+ ConceptNet enrichment, + optional LoRA)
+- Ensemble of English + Hinglish predictions
+- Optional Hindi augmentation/mining: translate EN sarcasm → HI, embed, FAISS similarity search over monolingual corpora to mine sarcastic candidates
 
-## 🎯 Project Overview
+All optional parts are included and configurable.
 
-This project addresses the challenge of detecting non-literal language (sarcasm and irony) in multilingual settings. Unlike traditional sentiment analysis, sarcasm detection requires understanding context, discourse structure, and pragmatic interpretation.
+## 1) Prerequisites
+- Python 3.10–3.12
+- GPU with CUDA recommended (CPU works but is slower)
+- Internet access for first-time model downloads (Hugging Face)
 
-### Key Features
+## 2) Setup
+From the project root:
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
 
-- **Multilingual Support**: Native support for English and Hindi with language-specific models
-- **Context-Aware Analysis**: Incorporates conversational context and discourse-level features
-- **Modular Architecture**: Easy extension to new languages, domains, and data types
-- **Advanced Modeling**: Transformer-based models with contrastive learning and commonsense integration
-- **Comprehensive Evaluation**: Language-specific metrics and detailed error analysis
-
-## 🏗️ Architecture
-
+pip install -r requirements.txt
 ```
-src/
-├── models/                 # Model architectures
-│   └── sarcasm_model.py   # Multilingual classifier with language embeddings
-├── data/                  # Dataset handling
-│   ├── datasets.py        # Multilingual dataset classes
-│   ├── prepare_examples.py # Data preparation utilities
-│   └── prepare_hindi_data.py # Hindi-specific data preparation
-├── commonsense/           # External knowledge integration
-│   └── conceptnet.py      # ConceptNet commonsense hints
-├── train_multilingual.py  # Multilingual training script
-├── evaluate_multilingual.py # Multilingual evaluation script
-└── utils.py               # Language detection and utilities
-```
-
-## 🚀 Quick Start
-
-### 1. Installation
-
+Bash alternative:
 ```bash
-git clone <repository-url>
-cd common_sense_sarcasm_project
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Data Preparation
+## 3) Data preparation
+Place CSVs with two columns `text,label`.
+- English: `data/english/train.csv`, `data/english/val.csv`
+- Hinglish: `data/hinglish/train.csv`, `data/hinglish/val.csv`
 
-#### English Datasets
-```bash
-# Convert SARC dataset
-python src/data/prepare_examples.py --task sarc --inp data/sarc.csv --out data/sarc_unified.csv
-
-# Convert Headlines dataset
-python src/data/prepare_examples.py --task headlines --inp data/headlines.json --out data/headlines_unified.csv
-```
-
-#### Hindi Datasets
-```bash
-# Create synthetic Hindi data for testing
-python src/data/prepare_hindi_data.py --task synthetic --output data/hindi_synthetic.csv --num_examples 1000
-
-# Convert Hindi Twitter data
-python src/data/prepare_hindi_data.py --task twitter --input data/hindi_twitter.csv --output data/hindi_unified.csv
-```
-
-### 3. Training
-
-#### English-Only Model
-```bash
-python src/train_multilingual.py \
-    --config configs/default.yaml \
-    --train_path data/english_train.csv \
-    --val_path data/english_val.csv \
-    --language en \
-    --output_dir outputs/english_model
-```
-
-#### Hindi-Only Model
-```bash
-python src/train_multilingual.py \
-    --config configs/default.yaml \
-    --train_path data/hindi_train.csv \
-    --val_path data/hindi_val.csv \
-    --language hi \
-    --output_dir outputs/hindi_model
-```
-
-#### Multilingual Model (Both Languages)
-```bash
-python src/train_multilingual.py \
-    --config configs/default.yaml \
-    --train_path data/combined_train.csv \
-    --val_path data/combined_val.csv \
-    --language both \
-    --output_dir outputs/multilingual_model
-```
-
-### 4. Evaluation
-
-```bash
-python src/evaluate_multilingual.py \
-    --model_dir outputs/multilingual_model \
-    --val_path data/combined_val.csv \
-    --language both \
-    --output_dir evaluation_results
-```
-
-## 📊 Supported Datasets
-
-### English
-- **SARC**: Reddit comments with sarcasm labels and context
-- **Headlines**: News headlines labeled as sarcastic
-- **iSarcasm**: Twitter pairs (sarcastic/non-sarcastic)
-
-### Hindi
-- **Custom Hindi Twitter**: Hindi sarcasm dataset
-- **Synthetic Data**: Generated Hindi examples for testing
-- **Mixed Code**: Hinglish (Hindi-English mixed) text
-
-## 🔧 Configuration
-
-The framework uses YAML configuration files for easy customization:
-
-```yaml
-# configs/default.yaml
-model_name: roberta-base
-batch_size: 16
-epochs: 3
-lr: 2e-5
-
-languages:
-  en:
-    model_name: roberta-base
-    max_length: 192
-    use_commonsense: true
-    use_contrastive: true
-  hi:
-    model_name: ai4bharat/indic-bert
-    max_length: 256
-    use_commonsense: false
-    use_contrastive: true
-```
-
-## 🧠 Model Architecture
-
-### MultilingualSarcasmClassifier
-- **Language-Specific Encoders**: Uses appropriate models for each language
-  - English: RoBERTa, BERT, or custom models
-  - Hindi: Indic-BERT or other Indic language models
-- **Language Embeddings**: Explicit language identification for better cross-lingual understanding
-- **Attention Visualization**: Built-in attention weight extraction for interpretability
-- **Contrastive Learning**: InfoNCE loss for better representations
-
-### EnsembleMultilingualClassifier
-- **Multiple Models**: Separate encoders for each language
-- **Intelligent Routing**: Automatically routes inputs to appropriate language model
-- **Fusion Layer**: Combines representations when needed
-
-## 📈 Training Features
-
-- **Contrastive Learning**: Uses pair information for better representations
-- **Commonsense Integration**: Optional ConceptNet hints for English
-- **Context Handling**: Supports parent comments and conversation threads
-- **Language Detection**: Automatic language identification and routing
-- **Gradient Accumulation**: Efficient training with large models
-
-## 📊 Evaluation Metrics
-
-- **Overall Performance**: Macro F1, Precision, Recall, AUROC
-- **Language-Specific**: Separate metrics for each language
-- **Detailed Analysis**: Confusion matrices and error analysis
-- **Prediction Confidence**: Sarcasm probability scores
-- **Attention Visualization**: Word-level attention weights
-
-## 🌐 Language Support
-
-### English
-- Full commonsense integration (ConceptNet)
-- Context-aware processing
-- Advanced transformer models
-
-### Hindi
-- Indic-BERT backbone
-- Hindi-specific preprocessing
-- Cultural context awareness
-
-### Future Extensions
-- **Multilingual**: Support for more Indic languages
-- **Code-Mixed**: Hinglish and other mixed language text
-- **Domain Adaptation**: Product reviews, social media, etc.
-
-## 🔍 Interpretability
-
-- **Attention Weights**: Visualize which words the model focuses on
-- **Language Embeddings**: Understand language-specific representations
-- **Context Analysis**: See how context influences predictions
-- **Error Analysis**: Detailed breakdown of misclassifications
-
-## 📁 Data Format
-
-The framework expects a unified CSV format:
-
+Example CSV (UTF-8):
 ```csv
-text,label,context,pair_id,language
-"Great, another meeting",1,"Previous context here",A1,en
-"यह काम बहुत अच्छा है",0,"",NA,hi
+text,label
+"Great, another power cut in summer",1
+"I just love waiting in traffic",1
+"The app works as expected.",0
+```
+- Labels: 0 = non-sarcastic, 1 = sarcastic (binary)
+- Adjust paths/columns in the YAML configs under `configs/` if your layout differs.
+
+Directory layout example:
+```
+Project/
+  data/
+    english/
+      train.csv
+      val.csv
+    hinglish/
+      train.csv
+      val.csv
+  corpora/          # optional, for Hindi mining
+    hindi/
+      *.txt         # plain text files, one or more lines per file
 ```
 
-## 🚀 Advanced Usage
+### 3a) Recommended datasets and sources (from project outline)
 
-### Custom Models
+Use the following sources to acquire datasets, then convert them to the simple `text,label` CSV format and place them under `data/english/` or `data/hinglish/` as shown above.
+
+- **English**
+  - Tweets with Sarcasm and Irony (news headlines): `kaggle datasets download -d rmisra/news-headlines-dataset-for-sarcasm-detection`
+  - iSarcasm (intended sarcasm) dataset overview: `paperswithcode.com/dataset/isarcasm` (download via authors' link)
+  - SemEval-2018 Task 3: Irony detection in English tweets: `aclanthology.org/S18-1005/` (download via task page/CodaLab)
+
+- **Hinglish**
+  - HackArena Multilingual Sarcasm Detection: `kaggle datasets download -d nikhilmaram/hackarena-multilingual-sarcasm-detection`
+  - Sarcasm Detection Code-Mixed Dataset: `github.com/nikhilmaram/Sarcasm-Detection-Code-Mixed-Dataset`
+  - Sarcasm Detection in Hindi-English Code-Mixed Data: `github.com/nikhilmaram/Sarcasm-Detection-in-Hindi-English-Code-Mixed-Data`
+
+- **Hindi corpora (optional, for mining/augmentation)**
+  - IndicCorpv2 (Hindi subset): `ai4bharat.iitm.ac.in/indiccorp`
+  - IITB English–Hindi Parallel Text (BPCC): `cfilt.iitb.ac.in/iitb_parallel/`
+  - OSCAR dataset (Hindi subset): `oscar-corpus.com`
+
+Notes:
+- Ensure each CSV has exactly two columns named `text,label` with labels as 0/1.
+- For Kaggle datasets, you can use the Kaggle CLI (after configuring your API token) and unzip locally, then normalize column names before copying to `data/...`.
+- Some sources distribute multiple files/splits; you may merge/split as needed to produce `train.csv` and `val.csv`.
+
+### 3b) One-click download (optional)
+
+Use the helper script to fetch and organize public datasets mentioned above. You must have Kaggle CLI configured (`~/.kaggle/kaggle.json`).
+
+```bash
+bash scripts/download_datasets.sh
+```
+
+The script downloads into `data/english/`, `data/hinglish/`, and prints instructions for manually hosted datasets (SemEval Task 3, iSarcasm authors' link, Hindi corpora).
+
+## 4) English track (RoBERTa + RCNN)
+Config: `configs/english_roberta_rcnn.yaml`
+- Key toggles:
+  - `model.backbone`: e.g., `roberta-base`
+  - `model.lora.enabled`: true/false
+  - `train.batch_size`, `train.epochs`, etc.
+
+Train:
+```powershell
+python -m src.train_english --config configs/english_roberta_rcnn.yaml
+```
+Outputs:
+- Best checkpoint → `outputs/english_roberta_rcnn/best.pt`
+- Metrics printed each epoch (precision/recall/F1, macro)
+
+## 5) Hinglish track (mBERT/IndicBERT + GRU + ConceptNet)
+Config: `configs/hinglish_mbert_gru.yaml`
+- Key toggles:
+  - `model.backbone`: `bert-base-multilingual-cased`
+  - `model.alt_backbone`: `ai4bharat/indic-bert`
+  - `model.use_alt_backbone`: switch between the two
+  - `model.conceptnet.enabled`: enable semantic enrichment via ConceptNet
+  - `model.conceptnet.cache_dir`: on-disk cache for ConceptNet queries
+  - `model.lora.enabled`: true/false
+
+Train:
+```powershell
+python -m src.train_hinglish --config configs/hinglish_mbert_gru.yaml
+```
+Outputs:
+- Best checkpoint → `outputs/hinglish_mbert_gru/best.pt`
+- Metrics printed each epoch
+
+ConceptNet notes:
+- Requires internet to fetch related concepts the first time
+- Results are cached under `cache/conceptnet/` by default
+- You can disable by setting `model.conceptnet.enabled: false`
+
+## 6) Optional: Generate prediction CSVs for ensembling
+The ensemble expects probability CSVs of the form: `id,p0,p1` (+ optional `pred`). If you want to ensemble dev/validation predictions, export them with a small script after training. Example snippet (edit paths/model names as needed):
 ```python
-from src.models.sarcasm_model import create_multilingual_model
+import os, torch, pandas as pd
+from transformers import AutoTokenizer, AutoModel
+from src.models.rcnn import RCNNHead
+from src.data.preprocess import TokenizeCollator
+from torch.utils.data import DataLoader, Dataset
 
-# Create custom model
-model = create_multilingual_model(config, language="hi")
+# Config
+model_name = "roberta-base"
+ckpt = "outputs/english_roberta_rcnn/best.pt"
+val_csv = "data/english/val.csv"
+max_len = 128
+
+# Load
+tok = AutoTokenizer.from_pretrained(model_name)
+backbone = AutoModel.from_pretrained(model_name)
+head = RCNNHead(hidden_size=backbone.config.hidden_size, num_labels=2)
+class M(torch.nn.Module):
+    def __init__(self,b,h):
+        super().__init__(); self.b=b; self.h=h
+    def forward(self, ids, mask):
+        seq = self.b(input_ids=ids, attention_mask=mask).last_hidden_state
+        return self.h(seq, mask)
+model = M(backbone, head)
+model.load_state_dict(torch.load(ckpt, map_location="cpu"))
+model.eval()
+
+# Data
+df = pd.read_csv(val_csv)
+texts, labels = df["text"].tolist(), df["label"].tolist()
+collate = TokenizeCollator(tok, max_len)
+class DS(Dataset):
+    def __len__(self): return len(texts)
+    def __getitem__(self, i): return {"text": texts[i], "label": int(labels[i])}
+loader = DataLoader(DS(), batch_size=32, shuffle=False, collate_fn=collate)
+
+# Predict
+import torch, numpy as np
+probs_all, ids = [], list(range(len(texts)))
+with torch.no_grad():
+    for batch in loader:
+        logits = model(batch["input_ids"], batch["attention_mask"])
+        probs = torch.softmax(logits, dim=-1).cpu().numpy()
+        probs_all.append(probs)
+probs_all = np.vstack(probs_all)
+
+# Save
+out = pd.DataFrame({"id": ids, "p0": probs_all[:,0], "p1": probs_all[:,1], "pred": probs_all.argmax(1)})
+os.makedirs("outputs/preds", exist_ok=True)
+out.to_csv("outputs/preds/english_val_probs.csv", index=False)
 ```
+Repeat similarly for the Hinglish model to produce `outputs/preds/hinglish_val_probs.csv`.
 
-### Custom Datasets
-```python
-from src.data.datasets import MultilingualSarcasmDataset
-
-# Load custom dataset
-dataset = MultilingualSarcasmDataset("path/to/data.csv", target_language="en")
+## 7) Ensemble
+Weighted average:
+```powershell
+python -m src.ensemble --preds outputs/preds/english_val_probs.csv outputs/preds/hinglish_val_probs.csv --weights 0.5 0.5 --out outputs/preds/ensemble_val.csv
 ```
+- Change the weights to emphasize one track over the other
+- The output includes `pred` computed from the combined probabilities
 
-### Language Detection
-```python
-from src.utils import detect_language
+## 8) Optional: Hindi augmentation/mining
+Config: `configs/hindi_mining.yaml`
+- Inputs:
+  - `--src_csv`: English sarcasm CSV with columns `text,label` (and optional `id`)
+  - Monolingual Hindi corpora: put `.txt` files under `corpora/hindi/` (nested folders allowed)
 
-# Detect language of text
-lang = detect_language("यह क्या बात है?")
-print(lang)  # Output: "hi"
+Steps:
+```powershell
+# 1) Translate EN sarcasm to Hindi (writes Sar_H')
+python -m src.hindi_mining.run --config configs/hindi_mining.yaml --src_csv data/english/train.csv
+
+# 2) Build FAISS index over monolingual Hindi corpora
+# 3) Mine semantically similar candidates
+# (both are executed by the same run command once translated file exists)
 ```
+Outputs:
+- FAISS index: `outputs/hindi_mining/index.faiss`
+- Mined candidates: `outputs/hindi_mining/mined_candidates.csv`
 
-## 📚 Related Papers
+Notes:
+- Manually spot-check `mined_candidates.csv` to validate sarcasm quality before training any Hindi model
+- If FAISS installation is problematic on Windows, consider using conda (`conda install -c pytorch faiss-cpu`) or run the mining on Linux; you can skip this optional step otherwise
 
-- **SARC Dataset**: "A Large Self-Annotated Corpus for Sarcasm" (Khodak et al., 2018)
-- **iSarcasm**: "iSarcasm: A Dataset of Intended Sarcasm" (Abu Farha et al., 2021)
-- **Indic-BERT**: "IndicNLPSuite: Monolingual Corpora, Evaluation Benchmarks and Pre-trained Multilingual Language Models for Indian Languages" (Kakwani et al., 2020)
+## 9) Configuration tips
+- LoRA: toggle `model.lora.enabled` and tune `r`, `alpha`, `dropout`
+- Sequence length: `model.max_length`
+- Optim schedule: `train.lr`, `train.warmup_ratio`, `train.grad_accum_steps`
+- ConceptNet: disable if you prefer pure text baselines or are offline
 
-## 🤝 Contributing
+## 10) Reproducibility
+- Global seed set in YAML (`seed`)
+- Best checkpoints saved under `outputs/.../best.pt`
+- Logs/metrics printed to console; redirect stdout to save
 
-1. Fork the repository
-2. Create a feature branch
-3. Add tests for new functionality
-4. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🙏 Acknowledgments
-
-- ConceptNet for commonsense knowledge
-- HuggingFace for transformer models
-- Indic-BERT team for Hindi language models
-- The sarcasm detection research community
-
----
-
-**For questions and support, please open an issue or contact the maintainers.**
+## 11) Troubleshooting
+- First run downloads models; ensure internet or pre-cache HF models
+- Windows + FAISS: if `pip install faiss-cpu` fails, try conda (`conda install faiss-cpu -c pytorch`) or skip Hindi mining
+- CUDA OOM: lower `train.batch_size` or increase `train.grad_accum_steps`, reduce `model.max_length`
+- Slow CPU runs: prefer GPU; or enable LoRA to reduce trainable params
