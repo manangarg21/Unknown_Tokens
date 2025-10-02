@@ -11,7 +11,7 @@ The workflow is designed to run on an HPC cluster with a SLURM scheduler and use
 Place files in your home directory in a structure similar to the following:
 
 ```
-sarcasm_project/
+hindi_dataset_generation/
 │
 ├── data/
 │   └── english/
