@@ -22,6 +22,7 @@ class SentenceEmbeddingEncoder:
             device=str(self.device),
             normalize_embeddings=True,
         )
-        return embeddings
+        # Clone to avoid returning an inference tensor which cannot be saved for backward
+        return embeddings.clone().detach()
 
 
