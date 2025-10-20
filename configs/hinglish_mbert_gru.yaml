@@ -1,0 +1,44 @@
+seed: 42
+exp_name: hinglish_mbert_gru
+output_dir: outputs/hinglish_mbert_gru
+
+model:
+  backbone: bert-base-multilingual-cased
+  alt_backbone: ai4bharat/indic-bert
+  use_alt_backbone: false
+  max_length: 128
+  lora:
+    enabled: true
+    r: 8
+    alpha: 16
+    dropout: 0.1
+  gru:
+    hidden: 256
+    layers: 1
+    bidirectional: true
+    dropout: 0.2
+  conceptnet:
+    enabled: true
+    max_concepts: 5
+    cache_dir: cache/conceptnet
+
+train:
+  batch_size: 16
+  grad_accum_steps: 2
+  epochs: 5
+  lr: 2.0e-5
+  weight_decay: 0.01
+  warmup_ratio: 0.06
+  fp16: true
+
+data:
+  train_file: data/hinglish/train.csv
+  val_file: data/hinglish/val.csv
+  text_col: text
+  label_col: label
+  num_labels: 2
+
+logging:
+  log_steps: 50
+  save_steps: 500
+  eval_steps: 500

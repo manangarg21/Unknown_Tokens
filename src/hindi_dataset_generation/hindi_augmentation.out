@@ -1,0 +1,57 @@
+==========================================
+SLURM_JOB_ID = 2505354
+SLURM_NODELIST = gnode042
+SLURM_JOB_GPUS = 3
+==========================================
+--- Setting Hugging Face cache to: /ssd_scratch/aanvik/huggingface_cache ---
+--- Initializing Conda and activating environment: anlp_unk_tok ---
+--- Logging in to Hugging Face Hub ---
+[33m⚠️  Warning: 'huggingface-cli login' is deprecated. Use 'hf auth login' instead.[0m
+--- Verifying PyTorch Installation ---
+PyTorch version: 2.7.1+cu118
+CUDA available: True
+--- Starting the data augmentation script for iSarcasm dataset ---
+--- Step 1: Loading Sarcasm Dataset from ./data/english/isarcasm2022.csv ---
+Loaded 3468 rows from CSV, found 867 sarcastic entries.
+
+--- Step 2: Translating English Sarcasm Dataset to Hindi ---
+Translation complete. Saved to ./data/hindi_dataset_generation/augmentation_output/output_isarcasm_translated.csv
+
+--- Step 3: Loading and Filtering Monolingual Hindi Corpus from /ssd_scratch/aanvik/indiccorp_hindi_corpus.txt ---
+Read 1000001 lines after offset, kept 1000000 valid sentences.
+
+--- Step 4: Performing Semantic Similarity Search ---
+Generating embeddings for translated sarcastic sentences (queries)...
+Generating embeddings for monolingual corpus (search space)...
+FAISS index built with 1000000 vectors.
+Search complete.
+
+--- Step 5: Creating Final Datasets ---
+Found 1016 unique potential sarcastic sentences.
+Saved potential sarcasm dataset to ./data/hindi_dataset_generation/augmentation_output/output_isarcasm_potential_sarcasm.csv
+Saved 200 samples for review to ./data/hindi_dataset_generation/augmentation_output/output_isarcasm_verification_sample.csv
+
+--- Pipeline Finished Successfully! ---
+--- Starting the data augmentation script for Huffington Post dataset ---
+--- Step 1: Loading Sarcasm Dataset from ./data/english/Sarcasm_Headlines_Dataset_v2.json ---
+Loaded 28619 rows from JSON, found 13634 sarcastic entries.
+
+--- Step 2: Translating English Sarcasm Dataset to Hindi ---
+Translation complete. Saved to ./data/hindi_dataset_generation/augmentation_output/output_huffpost_translated.csv
+
+--- Step 3: Loading and Filtering Monolingual Hindi Corpus from /ssd_scratch/aanvik/indiccorp_hindi_corpus.txt ---
+Read 1000001 lines after offset, kept 1000000 valid sentences.
+
+--- Step 4: Performing Semantic Similarity Search ---
+Generating embeddings for translated sarcastic sentences (queries)...
+Generating embeddings for monolingual corpus (search space)...
+FAISS index built with 1000000 vectors.
+Search complete.
+
+--- Step 5: Creating Final Datasets ---
+Found 9872 unique potential sarcastic sentences.
+Saved potential sarcasm dataset to ./data/hindi_dataset_generation/augmentation_output/output_huffpost_potential_sarcasm.csv
+Saved 200 samples for review to ./data/hindi_dataset_generation/augmentation_output/output_huffpost_verification_sample.csv
+
+--- Pipeline Finished Successfully! ---
+--- Script finished. ---
