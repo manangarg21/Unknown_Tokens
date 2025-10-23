@@ -123,6 +123,7 @@ def main():
     if not label_col:
         raise SystemExit("Could not find a label column (try --label_col or use one of: label/sarcastic/sarcasm)")
     df = raw[[text_col, label_col]].rename(columns={text_col: "text", label_col: "label"}).dropna()
+    
     collate = TokenizeCollator(tokenizer=tokenizer, max_length=cfg["model"]["max_length"]) 
 
     class DS(Dataset):
