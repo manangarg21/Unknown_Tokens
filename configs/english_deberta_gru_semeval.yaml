@@ -1,26 +1,25 @@
 seed: 42
-exp_name: english_roberta_rcnn_semeval
-output_dir: outputs/english_roberta_rcnn_semeval
+exp_name: english_deberta_gru
+output_dir: outputs/english_deberta_gru
 
 model:
-  backbone: roberta-base
+  backbone: microsoft/deberta-v3-base
   max_length: 128
   lora:
     enabled: true
     r: 8
     alpha: 16
     dropout: 0.1
-  rcnn:
-    conv_channels: 256
-    kernel_sizes: [2,3,4]
-    rnn_hidden: 256
-    rnn_layers: 1
+  gru:
+    hidden: 256
+    layers: 1
+    bidirectional: true
     dropout: 0.2
 
 train:
   batch_size: 16
   grad_accum_steps: 2
-  epochs: 25
+  epochs: 20
   lr: 2.0e-5
   weight_decay: 0.01
   warmup_ratio: 0.05
@@ -37,3 +36,5 @@ logging:
   log_steps: 50
   save_steps: 500
   eval_steps: 500
+
+

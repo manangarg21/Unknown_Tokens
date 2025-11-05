@@ -15,6 +15,7 @@ from src.utils.seed import set_global_seed
 from src.utils.metrics import compute_classification_metrics
 from src.data.preprocess import load_csv, TokenizeCollator
 from src.models.rcnn import RCNNHead
+from src.models.gru import GRUHead
 from src.models.lora import attach_lora
 
 
@@ -43,15 +44,28 @@ def main(cfg: Dict[str, Any]) -> None:
     if cfg["model"]["lora"]["enabled"]:
         backbone = attach_lora(backbone, r=cfg["model"]["lora"]["r"], alpha=cfg["model"]["lora"]["alpha"], dropout=cfg["model"]["lora"]["dropout"]) 
 
-    head = RCNNHead(
-        hidden_size=hidden_size,
-        num_labels=cfg["data"]["num_labels"],
-        conv_channels=cfg["model"]["rcnn"]["conv_channels"],
-        kernel_sizes=tuple(cfg["model"]["rcnn"]["kernel_sizes"]),
-        rnn_hidden=cfg["model"]["rcnn"]["rnn_hidden"],
-        rnn_layers=cfg["model"]["rcnn"]["rnn_layers"],
-        dropout=cfg["model"]["rcnn"]["dropout"],
-    )
+    # Select head based on config presence (supports either RCNN or GRU)
+    if "rcnn" in cfg["model"]:
+        head = RCNNHead(
+            hidden_size=hidden_size,
+            num_labels=cfg["data"]["num_labels"],
+            conv_channels=cfg["model"]["rcnn"]["conv_channels"],
+            kernel_sizes=tuple(cfg["model"]["rcnn"]["kernel_sizes"]),
+            rnn_hidden=cfg["model"]["rcnn"]["rnn_hidden"],
+            rnn_layers=cfg["model"]["rcnn"]["rnn_layers"],
+            dropout=cfg["model"]["rcnn"]["dropout"],
+        )
+    elif "gru" in cfg["model"]:
+        head = GRUHead(
+            hidden_size=hidden_size,
+            num_labels=cfg["data"]["num_labels"],
+            hidden=cfg["model"]["gru"]["hidden"],
+            layers=cfg["model"]["gru"]["layers"],
+            bidirectional=cfg["model"]["gru"].get("bidirectional", True),
+            dropout=cfg["model"]["gru"]["dropout"],
+        )
+    else:
+        raise ValueError("Config must contain either model.rcnn or model.gru")
 
     class Model(nn.Module):
         def __init__(self, backbone, head):
