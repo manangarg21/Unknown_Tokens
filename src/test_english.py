@@ -84,8 +84,12 @@ def main():
     args = parse_args()
     cfg = load_yaml(args.config)
 
+    # Enable MPS fallback on macOS and select best device (cuda > mps > cpu)
+    if torch.backends.mps.is_available():
+        os.environ.setdefault("PYTORCH_ENABLE_MPS_FALLBACK", "1")
+    device = torch.device("cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu"))
+
     model, tokenizer = build_model(cfg)
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
     model.eval()
 

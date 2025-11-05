@@ -5,7 +5,7 @@
 #SBATCH --mem-per-cpu=3000
 #SBATCH -o english.txt
 #SBATCH --time="4-00:00:00"
-#SBATCH -w gnode076
+
 python3 -m venv /tmp/ab/newvenv
 source /tmp/ab/newvenv/bin/activate
 pip install -r requirements.txt

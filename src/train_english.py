@@ -26,7 +26,13 @@ def parse_args() -> argparse.Namespace:
 
 def main(cfg: Dict[str, Any]) -> None:
     set_global_seed(cfg.get("seed", 42))
-    accelerator = Accelerator()
+    # Enable MPS fallback on macOS for unsupported ops
+    if torch.backends.mps.is_available():
+        os.environ.setdefault("PYTORCH_ENABLE_MPS_FALLBACK", "1")
+
+    device_type = "cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")
+    mixed_precision = "fp16" if cfg["train"].get("fp16", False) and device_type == "cuda" else "no"
+    accelerator = Accelerator(mixed_precision=mixed_precision)
     ensure_dir(cfg["output_dir"]) 
 
     model_name = cfg["model"]["backbone"]

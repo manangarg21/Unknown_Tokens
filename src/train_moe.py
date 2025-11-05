@@ -99,7 +99,10 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # Enable MPS fallback on macOS and select best device (cuda > mps > cpu)
+    if torch.backends.mps.is_available():
+        os.environ.setdefault("PYTORCH_ENABLE_MPS_FALLBACK", "1")
+    device = torch.device("cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu"))
     ensure_dir(args.output_dir)
 
     cfg_hin = load_yaml(args.hinglish_config)

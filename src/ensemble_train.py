@@ -116,7 +116,10 @@ def get_predictions(model: Model, loader: DataLoader, device: torch.device) -> n
 
 def main():
     args = parse_args()
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # Enable MPS fallback on macOS and select best device (cuda > mps > cpu)
+    if torch.backends.mps.is_available():
+        os.environ.setdefault("PYTORCH_ENABLE_MPS_FALLBACK", "1")
+    device = torch.device("cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu"))
     os.makedirs(args.output_dir, exist_ok=True)
     seed = 42
 

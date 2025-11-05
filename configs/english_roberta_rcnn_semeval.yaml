@@ -1,6 +1,6 @@
-seed: 100
+seed: 42
 exp_name: english_roberta_rcnn_semeval
-output_dir: outputs/english_roberta_rcnn_semeval
+output_dir: outputs/english_roberta_rcnn_semeval_deberta
 
 model:
   backbone: roberta-base
@@ -20,15 +20,15 @@ model:
 train:
   batch_size: 16
   grad_accum_steps: 2
-  epochs: 5
+  epochs: 25
   lr: 2.0e-5
   weight_decay: 0.01
-  warmup_ratio: 0.06
+  warmup_ratio: 0.05
   fp16: true
 
 data:
-  train_file: data/english/semeval2018_taskA/train.csv
-  val_file: data/english/semeval2018_taskA/val.csv
+  train_file: data/english/semeval/train.csv
+  val_file: data/english/semeval/val.csv
   text_col: text
   label_col: label
   num_labels: 2
@@ -37,5 +37,3 @@ logging:
   log_steps: 50
   save_steps: 500
   eval_steps: 500
-
-

@@ -14,7 +14,6 @@ rich
 sentence-transformers>=2.2.2
 faiss-cpu
 langdetect
-pycld3
 emoji
 requests
 cachetools

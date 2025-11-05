@@ -6,7 +6,7 @@ model:
   backbone: roberta-base
   max_length: 128
   lora:
-    enabled: true
+    enabled: false
     r: 8
     alpha: 16
     dropout: 0.1
@@ -14,16 +14,16 @@ model:
     conv_channels: 256
     kernel_sizes: [2,3,4]
     rnn_hidden: 256
-    rnn_layers: 1
-    dropout: 0.2
+    rnn_layers: 2
+    dropout: 0.1
 
 train:
   batch_size: 16
   grad_accum_steps: 2
-  epochs: 5
+  epochs: 15
   lr: 2.0e-5
   weight_decay: 0.01
-  warmup_ratio: 0.06
+  warmup_ratio: 0.07
   fp16: true
 
 data:
