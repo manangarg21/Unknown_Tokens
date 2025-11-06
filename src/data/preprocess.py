@@ -49,10 +49,14 @@ def maybe_strip_emojis_inplace(df: pd.DataFrame, remove_emojis: bool, remove_ali
 class TokenizeCollator:
     tokenizer: PreTrainedTokenizer
     max_length: int
+    primary_label_key: str = "label"
+    extra_label_keys: List[str] = None
 
     def __call__(self, batch: List[Dict[str, Any]]) -> Dict[str, Any]:
+        if self.extra_label_keys is None:
+            self.extra_label_keys = []
         texts = [item["text"] for item in batch]
-        labels = [int(item["label"]) for item in batch]
+        labels = [int(item[self.primary_label_key]) for item in batch]
         toks = self.tokenizer(
             texts,
             max_length=self.max_length,
@@ -60,5 +64,10 @@ class TokenizeCollator:
             padding=True,
             return_tensors="pt",
         )
-        toks["labels"] = __import__("torch").tensor(labels, dtype=__import__("torch").long)
+        torch = __import__("torch")
+        toks["labels"] = torch.tensor(labels, dtype=torch.long)
+        for k in self.extra_label_keys:
+            aux = [int(item[k]) for item in batch if k in item]
+            if len(aux) == len(batch):
+                toks[f"labels_{k}"] = torch.tensor(aux, dtype=torch.long)
         return toks

@@ -29,7 +29,6 @@ train:
 data:
   train_file: data/english/isarcasm_train.csv
   val_file: data/english/isarcasm_val.csv
-askA/val.csv
   text_col: text
   label_col: label
   num_labels: 2

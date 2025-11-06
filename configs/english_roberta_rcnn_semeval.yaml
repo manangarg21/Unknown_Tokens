@@ -1,12 +1,12 @@
 seed: 42
 exp_name: english_roberta_rcnn_semeval
-output_dir: outputs/english_roberta_rcnn_semeval
+output_dir: outputs/english_roberta_rcnn_semeval_no_lora_aux
 
 model:
   backbone: roberta-base
   max_length: 128
   lora:
-    enabled: true
+    enabled: false
     r: 8
     alpha: 16
     dropout: 0.1
@@ -33,7 +33,15 @@ data:
   label_col: label
   num_labels: 2
 
+aux_heads:
+  sentiment:
+    num_classes: 3
+    loss_weight: 0.2
+  flip:
+    num_classes: 2
+    loss_weight: 0.2
+
 logging:
-  log_steps: 50
+  log_steps: 100
   save_steps: 500
   eval_steps: 500
