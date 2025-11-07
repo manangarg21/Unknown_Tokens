@@ -1,4 +1,4 @@
-# Unknown_Tokens: Context-Aware Sarcasm and Irony Detection
+# Unknown_Tokens: Context-Aware Sarcasm Detection
 
 Context-aware sarcasm/irony detection for English and Hinglish with configurable backbones, lightweight heads, optional LoRA adapters, ConceptNet enrichment, and ensembling/MoE.
 
@@ -165,4 +165,8 @@ Environment overrides (optional):
 export SARCASM_CONFIG=configs/english_roberta_rcnn_sarcasm.yaml
 export SARCASM_CKPT=outputs/english_roberta_rcnn_sarcasm/best.pt
 ```
+
+## 10) Model Outputs
+
+All models are present in this google drive: [Drive Link](https://drive.google.com/drive/folders/1CQxew9L6jNaGJyISBQn8ZjFrxPpu2APl?usp=sharing)
 
