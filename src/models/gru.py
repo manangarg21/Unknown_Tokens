@@ -14,11 +14,20 @@ class GRUHead(nn.Module):
             bidirectional=bidirectional,
         )
         out_features = hidden * (2 if bidirectional else 1)
+        self.features_dim = out_features
         self.dropout = nn.Dropout(dropout)
         self.classifier = nn.Linear(out_features, num_labels)
 
-    def forward(self, sequence_output: torch.Tensor, attention_mask: torch.Tensor) -> torch.Tensor:
+    def extract_features(self, sequence_output: torch.Tensor, attention_mask: torch.Tensor) -> torch.Tensor:
         rnn_out, _ = self.gru(sequence_output)
         pooled = (rnn_out * attention_mask.unsqueeze(-1)).sum(dim=1) / attention_mask.sum(dim=1, keepdim=True)
-        logits = self.classifier(self.dropout(pooled))
+        return pooled
+
+    def forward_with_features(self, sequence_output: torch.Tensor, attention_mask: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        feats = self.extract_features(sequence_output, attention_mask)
+        logits = self.classifier(self.dropout(feats))
+        return logits, feats
+
+    def forward(self, sequence_output: torch.Tensor, attention_mask: torch.Tensor) -> torch.Tensor:
+        logits, _ = self.forward_with_features(sequence_output, attention_mask)
         return logits

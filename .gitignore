@@ -10,7 +10,6 @@ __pycache__/
 
 # Data and outputs
 cache/
-data/
 checkpoints/
 outputs/
 logs/

@@ -6,7 +6,7 @@ model:
   backbone: roberta-base
   max_length: 128
   lora:
-    enabled: true
+    enabled: false
     r: 8
     alpha: 16
     dropout: 0.1

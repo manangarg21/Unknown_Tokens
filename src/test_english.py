@@ -84,8 +84,12 @@ def main():
     args = parse_args()
     cfg = load_yaml(args.config)
 
+    # Enable MPS fallback on macOS and select best device (cuda > mps > cpu)
+    if torch.backends.mps.is_available():
+        os.environ.setdefault("PYTORCH_ENABLE_MPS_FALLBACK", "1")
+    device = torch.device("cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu"))
+
     model, tokenizer = build_model(cfg)
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
     model.eval()
 
@@ -123,6 +127,7 @@ def main():
     if not label_col:
         raise SystemExit("Could not find a label column (try --label_col or use one of: label/sarcastic/sarcasm)")
     df = raw[[text_col, label_col]].rename(columns={text_col: "text", label_col: "label"}).dropna()
+    
     collate = TokenizeCollator(tokenizer=tokenizer, max_length=cfg["model"]["max_length"]) 
 
     class DS(Dataset):

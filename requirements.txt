@@ -1,15 +1,17 @@
 torch
-transformers
+transformers>=4.40,<5
+tokenizers>=0.15
+huggingface_hub>=0.20
 datasets
-accelerate
-peft
+accelerate>=0.25
+peft>=0.10.0
 sentencepiece
 scikit-learn
 pandas
 numpy
 pyyaml
 rich
-sentence-transformers
+sentence-transformers>=2.2.2
 faiss-cpu
 langdetect
 emoji
@@ -17,3 +19,5 @@ requests
 cachetools
 tqdm
 jupyter
+fastapi
+uvicorn[standard]

@@ -1,0 +1,47 @@
+seed: 42
+exp_name: english_roberta_rcnn_semeval
+output_dir: outputs/english_roberta_rcnn_semeval_no_lora_aux
+
+model:
+  backbone: roberta-base
+  max_length: 128
+  lora:
+    enabled: false
+    r: 8
+    alpha: 16
+    dropout: 0.1
+  rcnn:
+    conv_channels: 256
+    kernel_sizes: [2,3,4]
+    rnn_hidden: 256
+    rnn_layers: 1
+    dropout: 0.2
+
+train:
+  batch_size: 16
+  grad_accum_steps: 2
+  epochs: 25
+  lr: 2.0e-5
+  weight_decay: 0.01
+  warmup_ratio: 0.05
+  fp16: true
+
+data:
+  train_file: data/english/semeval/train.csv
+  val_file: data/english/semeval/val.csv
+  text_col: text
+  label_col: label
+  num_labels: 2
+
+aux_heads:
+  sentiment:
+    num_classes: 3
+    loss_weight: 0.2
+  flip:
+    num_classes: 2
+    loss_weight: 0.2
+
+logging:
+  log_steps: 100
+  save_steps: 500
+  eval_steps: 500
