@@ -140,3 +140,29 @@ Common keys across YAML files in `configs/`:
 - First runs download models/tokenizers to the Hugging Face cache; ensure internet access.
 - If checkpoints fail to load with/without LoRA, the ensemble tester will retry toggling LoRA automatically; otherwise ensure the `model.lora.enabled` flag matches training.
 - ConceptNet enrichment can slow data prep on first epoch; it is cached afterward.
+
+## 9) Web app for sentence prediction
+
+A minimal FastAPI app is provided under `webapp/` to predict sarcasm for a single sentence and show results in a browser.
+
+Run locally:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+# Start the web server (default port 8000)
+uvicorn webapp.main:app --reload --port 8000
+```
+
+Open `http://localhost:8000` in your browser.
+
+Environment overrides (optional):
+
+```bash
+# Use a different config or checkpoint if desired
+export SARCASM_CONFIG=configs/english_roberta_rcnn_sarcasm.yaml
+export SARCASM_CKPT=outputs/english_roberta_rcnn_sarcasm/best.pt
+```
+
