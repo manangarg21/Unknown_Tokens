@@ -38,7 +38,7 @@ Example CSV:
 text,label
 "Great, another power cut in summer",1
 "I just love waiting in traffic",1
-"The app works as expected.",0
+"The code is working",0
 ```
 
 Optional corpora for Hindi mining/augmentation:
